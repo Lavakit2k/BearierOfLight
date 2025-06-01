@@ -7,8 +7,9 @@ import com.badlogic.gdx.math.Polygon;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 
-public abstract class Object {
+public abstract class BaseObject {
 
+    // TITLE: ----------------- ATTRIBUTES -------------------
     protected Texture texture;
     protected int ID;
     protected Vector3 position;
@@ -18,7 +19,9 @@ public abstract class Object {
     public float helligkeit = 1;
     public boolean visible = true;
 
-    public Object(Texture t, int id, Vector3 pos) {
+    // TITLE: ----------------- Constructor -------------------
+
+    public BaseObject(Texture t, int id, Vector3 pos) {
         this.size = new Vector2(1, 1);
         this.texture = t;
         this.ID = id;
@@ -26,14 +29,13 @@ public abstract class Object {
         createHitbox();
     }
 
-    // TITLE: ----------------- Methodes -------------------
-
     // TITLE: ----------------- Hitbox -------------------
-    abstract void createHitbox();
 
+    abstract void createHitbox();
+    abstract void updateHitbox();
     protected void createHexagonHitbox() {
-        float w = size.x * (texture != null ? texture.getWidth() : 32);
-        float h = size.y * (texture != null ? texture.getHeight() : 32);
+        float w = size.x * (texture != null ? texture.getWidth() : 256);
+        float h = size.y * (texture != null ? texture.getHeight() : 256);
 
         float centerX = position.x + w / 2;
         float centerY = position.y + h / 2;
@@ -52,10 +54,9 @@ public abstract class Object {
 
         hitbox = new Polygon(vertices);
     }
-
     protected void createRectangleHitbox() {
-        float width = texture.getWidth();
-        float height = texture.getHeight();
+        float width = (texture != null ? texture.getWidth() : 256);
+        float height = (texture != null ? texture.getHeight() : 256);
 
         float x = position.x;
         float y = position.y;
@@ -68,7 +69,6 @@ public abstract class Object {
 
         hitbox = new Polygon(vertices);
     }
-
     public void updateHexagonHitbox() {
         float w = size.x * (texture != null ? texture.getWidth() : 32);
         float h = size.y * (texture != null ? texture.getHeight() : 32);
@@ -76,16 +76,14 @@ public abstract class Object {
         float centerY = position.y + h / 2;
         hitbox.setPosition(centerX, centerY);
     }
-
     public void updateRectangleHitbox() {
-        hitbox.setPosition(position.x, position.y);
+        hitbox.setPosition(this.position.x, this.position.y);
     }
-
     public boolean isHit(Vector2 pos) {
         return hitbox.contains(pos.x, pos.y);
     }
 
-    // TITLE: ----------------- Rest -------------------
+    // TITLE: ----------------- Methodes -------------------
 
     public void zeichne(SpriteBatch s) {
         if (visible && texture != null) {
@@ -95,19 +93,13 @@ public abstract class Object {
                 texture.getWidth(), texture.getHeight(), false, false);
         }
     }
-
     public void dispose() {
         if (texture != null) {
             texture.dispose();
         }
     }
-    public abstract Object Clone();
-    public void highLight(){
-        helligkeit = 0.8f;
-    }
-    public void deHighLight(){
-        helligkeit = 1f;
-    }
+    public abstract BaseObject Clone();
+
 
     //TODO: in main klasse vorrechnen?
     public void updateVisibility(OrthographicCamera camera) {
@@ -123,17 +115,15 @@ public abstract class Object {
             position.y < camTop;
     }
 
-
-
     // TITLE: ----------------- Setter -------------------
 
-    public void setPosition(Vector3 newPos) {
+    public void setPosition(Vector3 newPos){
         position.set(newPos);
-        updateHexagonHitbox();
+        updateHitbox();
     }
     public void setSize(Vector2 newSize) {
         size.set(newSize);
-        createHexagonHitbox(); // Aktualisiert die Hitbox mit neuer Größe
+        createHitbox();
     }
     public void setRotation(float r) {
         rotation = r;
@@ -148,11 +138,12 @@ public abstract class Object {
     public void off(){
         this.visible = false;
     }
+
     // TITLE: ----------------- Getter -------------------
 
-    public int getZ() {return (int)position.z;}
-    public int getY() {return (int)position.y;}
-    public int getX() {return (int)position.x;}
+    public int getPosZ() {return (int)position.z;}
+    public int getPosY() {return (int)position.y;}
+    public int getPosX() {return (int)position.x;}
     public Vector3 getPosition(){
         return position;
     }

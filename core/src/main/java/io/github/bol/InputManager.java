@@ -10,7 +10,7 @@ public class InputManager {
     }
 
     public void releaseInput() {
-        WorldGen.highLightBlock();
+        WorldGen.deBlockPointer();
     }
 
     public void longPress() {
@@ -18,7 +18,6 @@ public class InputManager {
     }
 
     public void shortPress(float delta) {
-        WorldGen.deHighLightBlock();
         pressButton();
     }
 

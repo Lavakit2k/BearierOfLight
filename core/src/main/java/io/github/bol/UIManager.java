@@ -11,7 +11,7 @@ public class UIManager {
         optionsButton.on();
 
         optionsButton.updateUI(new Vector3(v.x + MainScreen.worldWidth / 2 - 128, v.y + MainScreen.worldHeight / 2 - 128, 0));
-        menuTextBox.updateUI(new Vector3(menuTextBox.fromCenter(v).x, menuTextBox.fromCenter(v).y + 448, 0));
+        menuTextBox.updateUI(new Vector3(menuTextBox.fromGUICenter(v).x, menuTextBox.fromGUICenter(v).y + 448, 0));
 
         setAllText();
     }
