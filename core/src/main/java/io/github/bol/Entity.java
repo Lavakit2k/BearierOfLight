@@ -29,31 +29,22 @@ public class Entity extends Object implements Health {
     public void hpChange(float h) {
         hp += h;
     }
-
     public void updatePlayer(float delta, List<Polygon> colliders) {
-        // Schwerkraft anwenden, falls nicht auf Boden
         if (!isOnGround) {
             velocity.y += gravity * delta;
         }
-
-        // Vertikale Bewegung ausführen
         position.y += velocity.y * delta;
-
-        // Hitbox aktualisieren
         updateHexagonHitbox();
-
-        // Bodenprüfung zurücksetzen
         isOnGround = false;
 
-        // Aktuelle Z-Ebene bestimmen
-        int currentZ = (int) Math.floor(position.z);
+
 
         // Alle Collider prüfen, die zu Blöcken direkt unter dem Spieler gehören
         for (Polygon collider : colliders) {
             Block block = colliderOwnerMap.get(collider);
             if (block == null) continue;
 
-            if ((int) block.getPosition().z == currentZ - 1) {
+            if ((int) block.getPosition().z <= Player.position.z - 1) {
                 if (Intersector.overlapConvexPolygons(this.getHitbox(), collider)) {
                     // Landung auf Block
                     position.y = block.getPosition().y + 16; // Optional: exaktere Platzierung
@@ -64,6 +55,33 @@ public class Entity extends Object implements Health {
             }
         }
     }
+    /*
+    public void updatePlayer(float delta, List<Polygon> colliders) {
+        if (!isOnGround) {
+            velocity.y += gravity * delta;
+        }
+        position.y += velocity.y * delta;
+        updateHexagonHitbox();
+        isOnGround = false;
+
+
+
+        // Alle Collider prüfen, die zu Blöcken direkt unter dem Spieler gehören
+        for (Polygon collider : colliders) {
+            Block block = colliderOwnerMap.get(collider);
+            if (block == null) continue;
+
+            if ((int) block.getPosition().z <= Player.position.z - 1) {
+                if (Intersector.overlapConvexPolygons(this.getHitbox(), collider)) {
+                    // Landung auf Block
+                    position.y = block.getPosition().y + 16; // Optional: exaktere Platzierung
+                    velocity.y = 0;
+                    isOnGround = true;
+                    break;
+                }
+            }
+        }
+    }*/
 
     @Override
     public Entity Clone() {

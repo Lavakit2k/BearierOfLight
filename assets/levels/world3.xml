@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <World>
-  <Size width="10" height="10" depth="10" />
-  <Layer depth="0">
+  <Size width="10" depth="10" height="10" />
+  <Layer height="0">
     <Row y="0">3 3 3 3 3 3 3 1 1 1</Row>
     <Row y="1">3 3 3 3 3 3 2 2 2 1</Row>
     <Row y="2">3 3 3 3 3 3 2 2 2 1</Row>
@@ -13,7 +13,7 @@
     <Row y="8">2 2 2 2 2 2 2 2 2 2</Row>
     <Row y="9">1 2 2 2 2 2 2 2 2 2</Row>
   </Layer>
-  <Layer depth="1">
+  <Layer height="1">
     <Row y="0">2 2 2 2 2 2 2 1 1 1</Row>
     <Row y="1">2 2 2 2 2 2 2 1 1 1</Row>
     <Row y="2">2 2 2 2 2 2 2 2 1 1</Row>
@@ -25,7 +25,7 @@
     <Row y="8">1 1 1 1 1 1 1 1 1 1</Row>
     <Row y="9">1 1 1 1 1 1 1 1 1 1</Row>
   </Layer>
-  <Layer depth="2">
+  <Layer height="2">
     <Row y="0">4 4 4 4 1 1 1 1 1 1</Row>
     <Row y="1">4 1 1 4 1 1 1 1 1 1</Row>
     <Row y="2">4 1 1 1 1 1 1 1 1 1</Row>
@@ -37,7 +37,7 @@
     <Row y="8">1 1 1 1 1 1 1 1 1 1</Row>
     <Row y="9">1 1 1 1 1 1 1 1 1 1</Row>
   </Layer>
-  <Layer depth="3">
+  <Layer height="3">
     <Row y="0">4 4 4 4 1 1 1 1 1 1</Row>
     <Row y="1">6 1 1 4 1 1 1 1 1 1</Row>
     <Row y="2">4 1 1 1 1 1 1 1 1 1</Row>
@@ -49,7 +49,7 @@
     <Row y="8">1 1 1 1 1 1 1 1 1 1</Row>
     <Row y="9">1 1 1 1 1 1 1 1 1 1</Row>
   </Layer>
-  <Layer depth="4">
+  <Layer height="4">
     <Row y="0">1 1 1 1 1 1 1 1 1 1</Row>
     <Row y="1">4 4 4 1 1 1 1 1 1 1</Row>
     <Row y="2">4 4 4 1 1 1 1 1 1 1</Row>
@@ -61,7 +61,7 @@
     <Row y="8">1 1 1 1 1 1 1 1 1 1</Row>
     <Row y="9">1 1 1 1 1 1 1 1 1 1</Row>
   </Layer>
-  <Layer depth="5">
+  <Layer height="5">
     <Row y="0">1 1 1 1 1 1 1 1 1 1</Row>
     <Row y="1">1 1 1 1 1 1 1 1 1 1</Row>
     <Row y="2">1 1 1 1 1 1 1 1 1 1</Row>
@@ -73,7 +73,7 @@
     <Row y="8">1 1 1 1 1 1 1 1 1 1</Row>
     <Row y="9">1 1 1 1 1 1 1 1 1 1</Row>
   </Layer>
-  <Layer depth="6">
+  <Layer height="6">
     <Row y="0">1 1 1 1 1 1 1 1 1 1</Row>
     <Row y="1">1 1 1 1 1 1 1 1 1 1</Row>
     <Row y="2">1 1 1 1 1 1 1 1 1 1</Row>
@@ -85,7 +85,7 @@
     <Row y="8">1 1 1 1 1 1 1 1 1 1</Row>
     <Row y="9">1 1 1 1 1 1 1 1 1 1</Row>
   </Layer>
-  <Layer depth="7">
+  <Layer height="7">
     <Row y="0">1 1 1 1 1 1 1 1 1 1</Row>
     <Row y="1">1 1 1 1 1 1 1 1 1 1</Row>
     <Row y="2">1 1 1 1 1 1 1 1 1 1</Row>
@@ -97,7 +97,7 @@
     <Row y="8">1 1 1 1 1 1 1 1 1 1</Row>
     <Row y="9">1 1 1 1 1 1 1 1 1 1</Row>
   </Layer>
-  <Layer depth="8">
+  <Layer height="8">
     <Row y="0">1 1 1 1 1 1 1 1 1 1</Row>
     <Row y="1">1 1 1 1 1 1 1 1 1 1</Row>
     <Row y="2">1 1 1 1 1 1 1 1 1 1</Row>
@@ -109,7 +109,7 @@
     <Row y="8">1 1 1 1 1 1 1 1 1 1</Row>
     <Row y="9">1 1 1 1 1 1 1 1 1 1</Row>
   </Layer>
-  <Layer depth="9">
+  <Layer height="9">
     <Row y="0">1 1 1 1 1 1 1 1 1 1</Row>
     <Row y="1">1 1 1 1 1 1 1 1 1 1</Row>
     <Row y="2">1 1 1 1 1 1 1 1 1 1</Row>

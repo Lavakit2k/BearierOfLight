@@ -4,96 +4,149 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Polygon;
 import com.badlogic.gdx.math.Vector3;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Random;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class WorldGen {
 
-    // TITLE: ---------------------- ATTRIBUTES ----------------------
+    // TITLE:---------------------- Konstanten & Felder ----------------------
     public static int WORLD_WIDTH = 10;
-    public static int WORLD_HEIGHT = 10;
     public static int WORLD_DEPTH = 10;
+    public static int WORLD_HEIGHT = 10;
     public static final int BLOCK_SIZE = 256;
+    public static final float HEIGHT_PER_LAYER = BLOCK_SIZE / 2f + 16f;
+
+    private static float yOffsetAmount = -10f;
+    private static float xOffsetAmount = -8.5f;
+    private static float zOffsetAmount = BLOCK_SIZE / 2f + 16f;
 
     public static List<Block> worldBlocks = new ArrayList<>();
     public static List<Polygon> colliders = new ArrayList<>();
-    public static int[][][] worldData = new int[WORLD_WIDTH][WORLD_HEIGHT][WORLD_DEPTH];
+    public static int[][][] worldData = new int[WORLD_WIDTH][WORLD_DEPTH][WORLD_HEIGHT];
     private static Random random = new Random();
-    private static boolean player = true;
+    private static boolean playerExists = true;
 
-    // TITLE: -------------------- GENERATE WORLD --------------------
+    // Highlight-Block
+    public static Block pointer = new Block(Textures.Dirt, 0, Vector3.Zero);
 
-    public static void GenerateWorldData() {
-        // Schritt 1: Welt mit Erde und Gras auffüllen
+    // TITLE:---------------------- Hilfsfunktionen ----------------------
+
+    private static void setSize(String worldName) {
+        worldData = LevelManager.loadWorld(worldName);
+        WORLD_WIDTH = worldData.length;
+        WORLD_DEPTH = worldData[0].length;
+        WORLD_HEIGHT = worldData[0][0].length;
+    }
+
+    //Flip
+    /*private static void flipWorldData() {
+        int[][][] flipped = new int[WORLD_WIDTH][WORLD_DEPTH][WORLD_HEIGHT];
+
         for (int x = 0; x < WORLD_WIDTH; x++) {
-            for (int y = 0; y < WORLD_HEIGHT; y++) {
-                int groundHeight = 3 + random.nextInt(3); // Basis-Höhe (3) + Hügelhöhe (0-2)
+            for (int y = 0; y < WORLD_DEPTH; y++) {
+                for (int z = 0; z < WORLD_HEIGHT; z++) {
+                    int flippedX = WORLD_WIDTH - 1 - x;
+                    int flippedY = WORLD_DEPTH - 1 - y;
+                    int flippedZ = WORLD_HEIGHT - 1 - z;
 
-                // 3 Schichten Erde
-                for (int z = 0; z < 3; z++) {
-                    worldData[x][y][z] = 2; // Erde
-                }
-
-                // 3 Schichten Gras (mit variabler Höhe)
-                for (int z = 3; z < groundHeight + 3; z++) {
-                    worldData[x][y][z] = 1; // Gras
+                    flipped[flippedY][flippedX][flippedZ] = worldData[x][y][z];
                 }
             }
         }
 
-        // Schritt 2: Bäume platzieren
-        for (int x = 2; x < WORLD_WIDTH - 2; x++) {
-            for (int y = 2; y < WORLD_HEIGHT - 2; y++) {
-                if (random.nextInt(15) == 0) { // 1/15 Chance für Baum
-                    int baseZ = getHighestBlock(x, y);
-                    if (baseZ >= 3) { // Baum nur auf Gras platzieren
-                        placeTree(x, y, baseZ + 1);
+        worldData = flipped;
+    } */
+
+    // TITLE:---------------------- Hauptmethode ----------------------
+
+    public static void LoadWorld(String worldName) {
+        //Technical
+        setSize(worldName);
+        worldBlocks.clear();
+        playerExists = true;
+        worldData = LevelManager.loadWorld(worldName);
+
+        // Block-Mapping vorbereiten
+        Map<Integer, Block> blockMap = Block.BlockList.stream()
+            .collect(Collectors.toMap(Block::getID, block -> block));
+
+
+        // Blockplatzierung
+        for (int z = 0; z < WORLD_HEIGHT; z++) {
+            for (int y = 0; y < WORLD_DEPTH; y++) {
+                for (int x = 0; x < WORLD_WIDTH; x++) {
+                    int blockID = worldData[x][y][z];
+                    if (blockID == 0) continue;
+
+                    float isoX = (x - y) * (BLOCK_SIZE / 2f);
+                    float isoY = (x + y) * (BLOCK_SIZE / 4f) + y * yOffsetAmount + x * xOffsetAmount - z * zOffsetAmount;
+
+                    Block prototype = blockMap.get(blockID);
+                    if (prototype == null) continue;
+
+                    Block block = new Block(prototype.texture, prototype.getID(), new Vector3(isoX, isoY, z), x , y);
+                    worldBlocks.add(block);
+
+                    // Spielerplatzierung nur einmal
+                    if (blockID == 2 && playerExists) {
+                        Entity.Player.setPosition(new Vector3(isoX, isoY , z + 1));
+                        playerExists = false;
                     }
                 }
             }
         }
-    }
-
-    private static void placeTree(int x, int y, int z) {
-        int[][][] treeStructure = new int[][][]{
-            { // Stamm (3 Blöcke hoch)
-                {0, 0, 0},
-                {0, 3, 0},
-                {0, 0, 0}
-            },
-            { // Blätter (3x3 Fläche)
-                {4, 4, 4},
-                {4, 3, 4},
-                {4, 4, 4}
-            }
-        };
-
-        for (int dz = 0; dz < treeStructure.length; dz++) {
-            for (int dx = -1; dx <= 1; dx++) {
-                for (int dy = -1; dy <= 1; dy++) {
-                    int newX = x + dx;
-                    int newY = y + dy;
-                    int newZ = z + dz;
-
-                    if (newX >= 0 && newX < WORLD_WIDTH && newY >= 0 && newY < WORLD_HEIGHT && newZ < WORLD_DEPTH) {
-                        int blockType = treeStructure[dz][dx + 1][dy + 1];
-                        if (blockType != 0) {
-                            worldData[newX][newY][newZ] = blockType;
-                        }
+        Path.setPathArray();
+        Path.calcPossiblePaths();
+        //TODO: Debug if everything is covert
+        /*for (int z = 0; z < WORLD_HEIGHT; z++) {
+            for (int y = 0; y < WORLD_DEPTH; y++) {
+                for (int x = 0; x < WORLD_WIDTH; x++) {
+                    if(Path.PathArray[x][y][z] == 1){
+                        WorldGen.worldBlocks.add(new Block(Textures.Glass, 7, WorldGen.gridToIso(x,y,z), x , y));
                     }
                 }
             }
+        }*/
+
+        // Sortierung für korrekte Zeichenreihenfolge
+        worldBlocks.sort((a, b) -> {
+            int compareZ = Integer.compare((int) b.getPosition().z, (int) a.getPosition().z);
+            if (compareZ != 0) return compareZ;
+            return Float.compare(b.getPosition().y, a.getPosition().y);
+        });
+
+        // Collider-Map für Entity-Kollisionen
+        Entity.colliderOwnerMap = new HashMap<>();
+        colliders.clear();
+        for (Block block : worldBlocks) {
+            colliders.add(block.getHitbox());
+            Entity.colliderOwnerMap.put(block.getHitbox(), block);
         }
+
+
+
+
+
+
+
     }
 
-    // TITLE: -------------------- LOAD WORLD --------------------
+    // TITLE:---------------------- Methodes ----------------------
+
+    public static Block getBlockAtIsoPosition(int X, int Y, int z) {
+
+        for (Block b : worldBlocks) {
+            if (b.gridX == X && b.gridY == Y && (int)b.getZ() == z) {
+                return b;
+            }
+        }
+        return null;
+    }
+
+
 
     private static int getHighestBlock(int x, int y) {
-        for (int z = WORLD_DEPTH - 1; z >= 0; z--) {
+        for (int z = WORLD_HEIGHT - 1; z >= 0; z--) {
             if (worldData[x][y][z] != 0) {
                 return z;
             }
@@ -101,83 +154,52 @@ public class WorldGen {
         return 0;
     }
 
-    private static void setSize(String worldName){
-        worldData = LevelManager.loadWorld(worldName);
-        WORLD_WIDTH = worldData.length;
-        WORLD_HEIGHT = worldData[0].length;
-        WORLD_DEPTH = worldData[0][0].length;
+    public static Vector3 gridToIso(int x, int y, int z) {
+        float halfBlock = BLOCK_SIZE / 2f;
+        float quarterBlock = BLOCK_SIZE / 4f;
+
+        float isoX = (x - y) * halfBlock;
+        float isoY = (x + y) * quarterBlock
+            + y * yOffsetAmount
+            + x * xOffsetAmount
+            - z * zOffsetAmount;
+
+        return new Vector3(isoX, isoY, z);
     }
 
-    private static void flipWorldData() {
-        int mid = WORLD_DEPTH / 2;
-        for (int x = 0; x < WORLD_WIDTH; x++) {
-            for (int y = 0; y < WORLD_HEIGHT; y++) {
-                for (int z = 0; z < mid; z++) {
-                    int oppositeZ = WORLD_DEPTH - 1 - z;
+    public static Vector3 isoToGrid(int x, int y, float z) {
+        float halfBlock = BLOCK_SIZE / 2f;
+        float quarterBlock = BLOCK_SIZE / 4f;
 
-                    // Werte tauschen
-                    int temp = worldData[x][y][z];
-                    worldData[x][y][z] = worldData[x][y][oppositeZ];
-                    worldData[x][y][oppositeZ] = temp;
-                }
-            }
-        }
+        // Rückrechnung der Basisformeln
+        float approxXplusY = (y + z * zOffsetAmount) / quarterBlock;
+        float approxXminusY = x / halfBlock;
+
+        // Näherung der Grid-Koordinaten (vor y/x Offset-Korrektur!)
+        float approxX = (approxXplusY + approxXminusY) / 2f;
+        float approxY = (approxXplusY - approxXminusY) / 2f;
+
+        // Korrektur durch yOffset & xOffset
+        float correctedX = (approxX - yOffsetAmount * approxY / BLOCK_SIZE) / (1 + xOffsetAmount / BLOCK_SIZE);
+        float correctedY = (approxY - xOffsetAmount * approxX / BLOCK_SIZE) / (1 + yOffsetAmount / BLOCK_SIZE);
+
+        int gx = Math.round(correctedX);
+        int gy = Math.round(correctedY);
+        int gz = Math.round(z);
+
+        return new Vector3(gx, gy, gz);
     }
 
-    public static void LoadWorld(String worldName) {
-        setSize(worldName);
-        worldData = new int[WORLD_WIDTH][WORLD_HEIGHT][WORLD_DEPTH];
-        worldBlocks.clear();
-
-        worldData = LevelManager.loadWorld(worldName);
-        flipWorldData();
-
-        float yOffsetAmount = -10f;
-        float xOffsetAmount = -8.5f;
-        float zOffsetAmount = BLOCK_SIZE / 2f + 16f; // Verbesserte Höhe für isometrische Darstellung
-
-        // Map für schnellen Zugriff auf Blöcke
-        Map<Integer, Block> blockMap = Block.BlockList.stream()
-            .collect(Collectors.toMap(Block::getID, block -> block));
-
-        for (int z = 0; z < WORLD_DEPTH; z++) { // Von oben nach unten generieren
-            for (int y = 0; y < WORLD_HEIGHT; y++) {
-                for (int x = 0; x < WORLD_WIDTH; x++) {
-                    int blockID = worldData[x][y][z];
-                    if (blockID == 0) continue; // Kein Block an dieser Stelle
-
-
-                    float isoX = (x - y) * (BLOCK_SIZE / 2f);
-                    float isoY = (x + y) * (BLOCK_SIZE / 4f) + y * yOffsetAmount + x * xOffsetAmount - z * zOffsetAmount;
-
-                    Block prototype = blockMap.get(blockID);
-                    if (prototype != null) {
-                        worldBlocks.add(new Block(prototype.texture, prototype.getID(), new Vector3(isoX, isoY, z)));
-                    }
-                    if (blockID == 1 && player && random.nextInt(0, 20) == 1) {
-                        Entity.Player.setPosition(new Vector3(isoX - 500, isoY, z + 1));
-                        player = false;
-                    }
-                }
-            }
-        }
-        worldBlocks.sort((a, b) -> {
-            int compareZ = Integer.compare((int) b.getPosition().z, (int) a.getPosition().z); // Höherer Z-Wert zuerst
-            if (compareZ != 0) return compareZ;
-
-            return Float.compare(b.getPosition().y, a.getPosition().y); // Dann nach Y absteigend
-        });
-        Entity.colliderOwnerMap = new HashMap<>();
-        for (Block i : worldBlocks) {
-            colliders.add(i.getHitbox());
-            Entity.colliderOwnerMap.put(i.getHitbox(), i); // Damit die Entity weiß, welcher Block zu welcher Hitbox gehört
-        }
+    public static Vector3 getPositionOnTop(int x, int y) {
+        int z = getHighestBlock(x, y);
+        float isoX = (x - y) * (BLOCK_SIZE / 2f);
+        float isoY = (x + y) * (BLOCK_SIZE / 4f) + y * -10f + x * -8.5f - z * (BLOCK_SIZE / 2f + 16f);
+        return new Vector3(isoX, isoY, z + 1); // +1 damit es *über* dem Block ist
     }
 
-    // TITLE: ---------------------- METHODES ----------------------
 
-    //for highlight
-    private static Block pointer = new Block(Textures.Dirt, 0, Vector3.Zero);
+
+    // TITLE:---------------------- Rendering & Highlighting ----------------------
 
     public static void DrawWorld(SpriteBatch s) {
         for (Block block : worldBlocks) {
@@ -189,12 +211,9 @@ public class WorldGen {
         int bestScore = Integer.MAX_VALUE;
         Block bestBlock = null;
 
-        for (Block block : WorldGen.worldBlocks) {
-
+        for (Block block : worldBlocks) {
             if (block.isHit(MainScreen.worldInputPosition)) {
-
                 int score = block.getZ() * 1000000 + block.getY() * 1000 + block.getX();
-
                 if (score < bestScore) {
                     bestScore = score;
                     bestBlock = block;
@@ -202,7 +221,7 @@ public class WorldGen {
             }
         }
 
-        if(bestBlock != null){
+        if (bestBlock != null) {
             pointer = bestBlock;
             pointer.highLight();
         }

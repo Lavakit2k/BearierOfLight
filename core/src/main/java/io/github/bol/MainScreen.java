@@ -1,5 +1,9 @@
 package io.github.bol;
 
+import static io.github.bol.WorldGen.WORLD_DEPTH;
+import static io.github.bol.WorldGen.WORLD_HEIGHT;
+import static io.github.bol.WorldGen.WORLD_WIDTH;
+
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.Color;
@@ -71,10 +75,11 @@ public class MainScreen implements Screen, GestureListener {
         UI.InitListUI();
         Block.InitListBlock();
         Entity.InitListEntity();
-        WorldGen.GenerateWorldData();
-        WorldGen.LoadWorld("world2.xml");
+        WorldGen.LoadWorld("Debug.xml");
         uiManager.startUI(uiCamera.position);
         inputManager.setManager(uiManager);
+
+
     }
 
     @Override
@@ -88,14 +93,15 @@ public class MainScreen implements Screen, GestureListener {
         mainViewport.apply();
         handleInput(delta);
         Entity.Player.updatePlayer(delta, WorldGen.colliders);
+        MovementManager.update(delta);
 
         mainDraw();
         //drawPerformanceStats();
-        // UI
+
         //uiViewport.apply();
         drawUI();
         drawEntityHitbox();
-        drawMainHitbox();
+        //drawMainHitbox();
     }
 
 
@@ -175,8 +181,6 @@ public class MainScreen implements Screen, GestureListener {
         Entity.Player.zeichne(spriteBatch);
 
         spriteBatch.end();
-
-        //drawMainHitbox();
     }
 
     private void drawMainHitbox(){
