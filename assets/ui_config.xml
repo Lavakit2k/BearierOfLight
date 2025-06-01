@@ -1,0 +1,35 @@
+<ui>
+    <element>
+        <texture>BuiltButton</texture>
+        <id>0</id>
+        <position x="0" y="0" z="0"/>
+        <!-- Kein Text -->
+    </element>
+    <element>
+        <texture>OptionsButton</texture>
+        <id>1</id>
+        <position x="0" y="0" z="0"/>
+        <!-- Kein Text -->
+    </element>
+    <element>
+        <texture>TextBox</texture>
+        <id>2</id>
+        <position x="0" y="0" z="0"/>
+        <texts>
+            <text font="title" color="FFFFFF">Options</text>
+            <text font="title" color="FFFFFF">Level</text>
+        </texts>
+    </element>
+    <element>
+        <texture>Bar</texture>
+        <id>3</id>
+        <position x="0" y="0" z="0"/>
+        <!-- Kein Text -->
+    </element>
+    <element>
+        <texture>BarFiller</texture>
+        <id>4</id>
+        <position x="0" y="0" z="0"/>
+        <!-- Kein Text -->
+    </element>
+</ui>
